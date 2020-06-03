@@ -11,19 +11,22 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from imblearn import over_sampling
 from sklearn.model_selection import KFold
+import xgboost as xgb
 
 data = pd.read_csv(os.path.join('..', 'data', 'LAA_computation_lcms1_cli_class_s.csv'))
 data = data.replace({'.':np.nan, '#N/A':np.nan})
-data = data.iloc[:, 3:202]
 data = data.dropna(subset=['Label'], axis=0)
-# data = data.dropna(axis=0)
+# only gene data ===============
+data = data.iloc[:, 3:198]
+# gene data and clinical data ==
+# data = data.iloc[:, 3:]
+# data = data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
 
-Y_data = data[['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4']]
+Y_data = data[['Label', 'S1', 'S2', 'S3', 'S4']]
 y_data = Y_data[['Label']]
 
-X_data = data.drop(['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4'], axis=1)
-dummy_cols = ['sex']
-X_data = pd.get_dummies(X_data, columns=dummy_cols)
+X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
+
 
 
 all_auroc = []
@@ -39,9 +42,9 @@ for train_index, test_index in KFold(n_splits=10, random_state=42, shuffle=True)
     X_test = imp.transform(X_test)
 
     # scaling
-    min_max_scaler = preprocessing.MinMaxScaler()
-    X_train = min_max_scaler.fit_transform(X_train)
-    X_test = min_max_scaler.transform(X_test)
+    scaler = preprocessing.MinMaxScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
     # over-sampling
     # print('before', y_train.groupby(['Label']).size())
@@ -50,8 +53,9 @@ for train_index, test_index in KFold(n_splits=10, random_state=42, shuffle=True)
     # print('after', y_train.groupby(['Label']).size())
 
     # define the model
-    model = ExtraTreesClassifier(n_estimators=250,  random_state=42)
+    # model = ExtraTreesClassifier(n_estimators=250,  random_state=42)
     # model = SVC(kernel='linear', probability=True)
+    model = xgb.XGBClassifier(objective='binary:logistic', learning_rate=0.5, subsample=0.5)
     model.fit(X_train, y_train.values.ravel())
     y_pred = model.predict_proba(X_test)
     fpr, tpr, thresholds = roc_curve(y_test, y_pred[:, 1])

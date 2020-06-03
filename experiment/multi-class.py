@@ -16,22 +16,29 @@ import xgboost as xgb
 
 data = pd.read_csv(os.path.join('..', 'data', 'LAA_computation_lcms1_cli_class_s.csv'))
 data = data.replace({'.':np.nan, '#N/A':np.nan})
-data = data.iloc[:, 3:202]
-# data = data.dropna(subset=['Label','miR21ΔΔct ', 'H1'], axis=0)
+# only gene data ===============
+data = data.iloc[:, 3:198]
+# gene data and clinical data ==
+# data = data.iloc[:, 3:]
+# data = data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
+
 how_many_null = data.isnull().sum().sort_values(ascending = False)
-Y_data = data[['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4']]
-
-label = 'C2'
-y_data = Y_data[[label]]
-
-# label = 'S2'
-# y_data = pd.cut(Y_data['S2'], [-1, 0, 9, 999], labels=[0, 1, 2]) #9
-# y_data = pd.DataFrame(y_data, columns=[label])
+Y_data = data[['Label', 'S1', 'S2', 'S3', 'S4']]
+label = 'S1'
+if label == 'S1':
+    c = 6
+elif label == 'S2':
+    c = 9
+elif label == 'S3':
+    c = 4
+else:
+    c = 7
+y_data = pd.cut(Y_data[label], [-1, 0, c, 999], labels=[0, 1, 2]) #9
+y_data = pd.DataFrame(y_data, columns=[label])
 # a = pd.concat((y_data, Y_data[['C2']]), axis=1)
 # a = pd.concat((a, Y_data[['S2']]), axis=1)
 
-X_data = data.drop(['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4'], axis=1)
-X_data = pd.get_dummies(X_data, columns=['sex'])
+X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
 
 all_acc = []
 # for i in range(10):

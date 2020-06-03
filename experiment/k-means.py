@@ -10,15 +10,16 @@ from sklearn import preprocessing
 from sklearn.decomposition import PCA
 
 # #############################################################################
-data = pd.read_csv(os.path.join('..', 'data', 'LAA_computation_lcms1_cli_class_s.csv'))
-data = data.replace({'.':np.nan, '#N/A':np.nan})
-data = data.iloc[:, 3:202]
+o_data = pd.read_csv(os.path.join('..', 'data', 'LAA_computation_lcms1_cli_class_s.csv'))
+o_data = o_data.replace({'.':np.nan, '#N/A':np.nan})
+data = o_data.iloc[:, 3:198]
 # data = data.dropna(subset=['Label','miR21ΔΔct ', 'H1'], axis=0)
 how_many_null = data.isnull().sum().sort_values(ascending = False)
 
 
-X_data = data.drop(['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4'], axis=1)
-X_data = pd.get_dummies(X_data, columns=['sex'])
+X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
+# X_data = pd.get_dummies(X_data, columns=['sex'])
+X_data = X_data.drop(['sex'], axis=1)
 
 # imputation or drop na
 # X_data = X_data.dropna(axis=0)
@@ -56,6 +57,7 @@ for n_clusters in range_n_clusters:
     # seed of 10 for reproducibility.
     clusterer = KMeans(n_clusters=n_clusters, random_state=10)
     cluster_labels = clusterer.fit_predict(X_data)
+    o_data['cluster_'+str(n_clusters)] = cluster_labels
 
     # The silhouette_score gives the average value for all the samples.
     # This gives a perspective into the density and separation of the formed
@@ -122,5 +124,5 @@ for n_clusters in range_n_clusters:
     plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
                   "with n_clusters = %d" % n_clusters),
                  fontsize=14, fontweight='bold')
-
+o_data.to_csv('kmean_result.csv', index=False)
 plt.show()

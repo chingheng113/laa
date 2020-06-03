@@ -12,12 +12,12 @@ data = data.replace({'.':np.nan, '#N/A':np.nan})
 data = data.iloc[:, 3:202]
 # data = data.dropna(subset=['Label','miR21ΔΔct ', 'H1'], axis=0)
 how_many_null = data.isnull().sum().sort_values(ascending = False)
-Y_data = data[['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4']]
-label = 'C2'
-y_data = Y_data[[label]].values.ravel()
+Y_data = data[['Label', 'S1', 'S2', 'S3', 'S4']]
+label = 'S2'
+y_data = pd.cut(Y_data['S2'], [-1, 0, 9, 999], labels=[0, 1, 2]) #9
+y_data = pd.DataFrame(y_data, columns=[label])
 
-X_data = data.drop(['Label', 'C1', 'C2', 'C3', 'C4', 'S1', 'S2', 'S3', 'S4'], axis=1)
-X_data = pd.get_dummies(X_data, columns=['sex'])
+X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
 
 
 # imputation or drop na
@@ -36,7 +36,7 @@ X_data = PCA(n_components=2).fit_transform(X_data)
 
 # #############################################################################
 # Compute DBSCAN
-db = DBSCAN(eps=1.5, min_samples=5).fit(X_data)
+db = DBSCAN(eps=2, min_samples=3).fit(X_data)
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
@@ -47,13 +47,13 @@ n_noise_ = list(labels).count(-1)
 
 print('Estimated number of clusters: %d' % n_clusters_)
 print('Estimated number of noise points: %d' % n_noise_)
-print("Homogeneity: %0.3f" % metrics.homogeneity_score(y_data, labels))
-print("Completeness: %0.3f" % metrics.completeness_score(y_data, labels))
-print("V-measure: %0.3f" % metrics.v_measure_score(y_data, labels))
-print("Adjusted Rand Index: %0.3f"
-      % metrics.adjusted_rand_score(y_data, labels))
-print("Adjusted Mutual Information: %0.3f"
-      % metrics.adjusted_mutual_info_score(y_data, labels))
+# print("Homogeneity: %0.3f" % metrics.homogeneity_score(y_data, labels))
+# print("Completeness: %0.3f" % metrics.completeness_score(y_data, labels))
+# print("V-measure: %0.3f" % metrics.v_measure_score(y_data, labels))
+# print("Adjusted Rand Index: %0.3f"
+#       % metrics.adjusted_rand_score(y_data, labels))
+# print("Adjusted Mutual Information: %0.3f"
+#       % metrics.adjusted_mutual_info_score(y_data, labels))
 print("Silhouette Coefficient: %0.3f"
       % metrics.silhouette_score(X_data, labels))
 
