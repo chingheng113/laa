@@ -9,7 +9,7 @@ import os
 # #############################################################################
 data = pd.read_csv(os.path.join('..', 'data', 'LAA_computation_lcms1_cli_class_s.csv'))
 data = data.replace({'.':np.nan, '#N/A':np.nan})
-data = data.iloc[:, 3:202]
+data = data.iloc[:, 3:198]
 # data = data.dropna(subset=['Label','miR21ΔΔct ', 'H1'], axis=0)
 how_many_null = data.isnull().sum().sort_values(ascending = False)
 Y_data = data[['Label', 'S1', 'S2', 'S3', 'S4']]
@@ -36,7 +36,7 @@ X_data = PCA(n_components=2).fit_transform(X_data)
 
 # #############################################################################
 # Compute DBSCAN
-db = DBSCAN(eps=2, min_samples=3).fit(X_data)
+db = DBSCAN(eps=1, min_samples=3).fit(X_data)
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
