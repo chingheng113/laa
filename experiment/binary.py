@@ -23,8 +23,8 @@ X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
 # only LC mars ===============
 # X_data = X_data.iloc[:, 3:7]
 
-# only aa ====================
-# X_data = X_data.iloc[:, 9:192]
+# only Metabolomics  ====================
+X_data = X_data.iloc[:, 9:192]
 
 # only clinical ==============
 # X_data = X_data.iloc[:, 193:]
@@ -32,8 +32,8 @@ X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
 # X_data = X_data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
 
 # all feature ==
-X_data = X_data.iloc[:, 3:]
-X_data = X_data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
+# X_data = X_data.iloc[:, 3:]
+# X_data = X_data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
 
 
 all_auroc = []
@@ -61,8 +61,8 @@ for train_index, test_index in KFold(n_splits=10, random_state=42, shuffle=True)
 
     # define the model
     # model = ExtraTreesClassifier(n_estimators=250,  random_state=42)
-    model = SVC(kernel='linear', probability=True)
-    # model = xgb.XGBClassifier(objective='binary:logistic', learning_rate=0.5, subsample=0.5)
+    # model = SVC(kernel='linear', probability=True)
+    model = xgb.XGBClassifier(objective='binary:logistic', learning_rate=0.5, subsample=0.5)
     model.fit(X_train, y_train.values.ravel())
     y_pred = model.predict_proba(X_test)
     fpr, tpr, thresholds = roc_curve(y_test, y_pred[:, 1])

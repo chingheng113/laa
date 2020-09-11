@@ -68,8 +68,8 @@ for train_index, test_index in KFold(n_splits=10, random_state=42, shuffle=True)
 
     # define the model
     # model = ExtraTreesClassifier(n_estimators=250,  random_state=42)
-    model = SVC(kernel='linear', probability=True)
-    # model = xgb.XGBClassifier(objective='binary:logistic', learning_rate=0.5, subsample=0.5)
+    # model = SVC(kernel='linear', probability=True)
+    model = xgb.XGBClassifier(objective='binary:logistic', learning_rate=0.5, subsample=0.5)
     model.fit(X_train_fs, y_train.values.ravel())
     y_pred = model.predict_proba(X_test_fs)
     fpr, tpr, thresholds = roc_curve(y_test, y_pred[:, 1])
@@ -80,10 +80,10 @@ print(np.mean(all_auroc), np.std(all_auroc))
 df = pd.DataFrame.from_dict(collections.Counter(fs_elements), orient='index', columns=['feq']).reset_index()
 result = df.sort_values(['feq'], ascending=0)
 result.set_index('index', inplace=True)
-
-
+a = result[result.feq > 9]
+print(result.shape)
 fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 20))
-sns.heatmap(result, annot=True, fmt="g", cmap='viridis', linewidths=0.3)
+sns.heatmap(result, annot=True, fmt="g", cmap='viridis', linewidths=0.3, yticklabels=True)
 plt.show()
 
 print('done')
