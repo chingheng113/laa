@@ -24,7 +24,7 @@ X_data = data.drop(['Label', 'S1', 'S2', 'S3', 'S4'], axis=1)
 # X_data = X_data.iloc[:, 3:7]
 
 # only Metabolomics  ====================
-X_data = X_data.iloc[:, 9:192]
+# X_data = X_data.iloc[:, 9:192]
 
 # only clinical ==============
 # X_data = X_data.iloc[:, 193:]
@@ -32,8 +32,8 @@ X_data = X_data.iloc[:, 9:192]
 # X_data = X_data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
 
 # all feature ==
-# X_data = X_data.iloc[:, 3:]
-# X_data = X_data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
+X_data = X_data.iloc[:, 3:]
+X_data = X_data.drop(['AcSugar', 'HsCRP1', 'Hemoglobin'], axis=1)  # too much missing
 
 
 all_auroc = []
